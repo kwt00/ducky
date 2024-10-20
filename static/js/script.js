@@ -35,7 +35,7 @@ if ('webkitSpeechRecognition' in window) {
     alert('Speech recognition not supported in this browser.');
 }
 
-// Awaiting reply messages
+// Awaiting reply messages (can be removed if not needed)
 const awaitingReplyMessages = [
     "Pondering the mysteries of the universe...",
     "Consulting with the AI elders...",
@@ -95,7 +95,7 @@ folderInput.addEventListener('change', () => {
     }
 });
 
-// Modified Event Listener for the Upload Button
+// Event Listener for the Upload Button
 uploadFolderButton.addEventListener('click', () => {
     const files = folderInput.files;
     if (files.length > 0) {
@@ -165,7 +165,7 @@ function startIndexing() {
     });
 }
 
-// Event listener for the save button
+// Event listener for the Save Button
 saveButton.addEventListener('click', () => {
     if (currentFilePath === '') {
         alert('No file selected.');
@@ -192,13 +192,10 @@ saveButton.addEventListener('click', () => {
     });
 });
 
-// Event listener for the send button in chat
+// Event listener for the Send Button in Chat
 sendButton.addEventListener('click', () => {
     const question = chatInput.value.trim();
     if (question !== '') {
-        // Display user's message
-        displayMessage(question, 'user-message');
-        chatInput.value = '';
         // Send question to the server
         fetch('/ask', {
             method: 'POST',
@@ -207,19 +204,25 @@ sendButton.addEventListener('click', () => {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.answer) {
-                // Display assistant's response
-                displayMessage(data.answer, 'assistant-message');
+            if (data.answer || data.redirect) {
+                // Redirect to the video immediately
+                redirectToVideo();
             } else if (data.error) {
-                displayMessage('Error: ' + data.error, 'assistant-message');
+                alert('Error: ' + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            displayMessage('An error occurred while getting the answer.', 'assistant-message');
+            alert('An error occurred while getting the answer.');
         });
     }
 });
+
+// Function to redirect to the video in the same tab
+function redirectToVideo() {
+    const videoUrl = '/static/videos/Untitled_video-Made_with_Clipchamp.mp4'; // Update the path and filename if necessary
+    window.location.href = videoUrl;
+}
 
 // Optional: Allow sending messages with Enter key in chat
 chatInput.addEventListener('keydown', (event) => {
@@ -229,17 +232,7 @@ chatInput.addEventListener('keydown', (event) => {
     }
 });
 
-// Function to display messages in the chat window
-function displayMessage(message, className) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = className;
-    messageDiv.textContent = message;
-    chatWindow.appendChild(messageDiv);
-    // Scroll to the bottom of the chat window
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-// Event listener for the begin conversation button (speech recognition)
+// Event listener for the Begin Conversation Button (Voice Assistant)
 beginConversationButton.addEventListener('click', () => {
     beginConversationButton.style.display = 'none';
     startConversation();
@@ -254,16 +247,13 @@ function startConversation() {
     updateSpeakerIndicator("User");
 }
 
-// Function to stop speaking and send the query
+// Function to stop speaking and send the query (Voice Assistant)
 function stopSpeakingAndSend() {
     recognition.stop();
     isSpeaking = false;
     updateSpeakerIndicator("Awaiting reply");
 
     const question = finalTranscript.trim();
-
-    // Display the user's question in the chat window
-    displayMessage(question, 'user-message');
 
     // Send the question to the server
     fetch('/ask', {
@@ -273,27 +263,12 @@ function stopSpeakingAndSend() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.answer) {
-            // Update speaker indicator
-            updateSpeakerIndicator("Assistant");
-
-            // Display the assistant's response
-            displayMessage(data.answer, 'assistant-message');
-
-            // Use speech synthesis to read the response aloud
-            const utterance = new SpeechSynthesisUtterance(data.answer);
-            speechSynthesis.speak(utterance);
-
-            // Restart conversation after speaking
-            utterance.onend = () => {
-                updateSpeakerIndicator("User");
-                recognition.start();
-                isSpeaking = true;
-                finalTranscript = '';
-            };
+        if (data.answer || data.redirect) {
+            // Redirect to the video immediately
+            redirectToVideo();
         } else if (data.error) {
-            displayMessage('Error: ' + data.error, 'assistant-message');
-            updateSpeakerIndicator("User");
+            alert('Error: ' + data.error);
+            // Optionally, you can restart the conversation or handle the error differently
             recognition.start();
             isSpeaking = true;
             finalTranscript = '';
@@ -301,8 +276,8 @@ function stopSpeakingAndSend() {
     })
     .catch(error => {
         console.error('Error:', error);
-        displayMessage('An error occurred while getting the answer.', 'assistant-message');
-        updateSpeakerIndicator("User");
+        alert('An error occurred while getting the answer.');
+        // Optionally, you can restart the conversation or handle the error differently
         recognition.start();
         isSpeaking = true;
         finalTranscript = '';
@@ -324,15 +299,12 @@ recognition.onresult = function (event) {
         }
     }
 
-    // Optionally, display interim results somewhere
-    // For simplicity, we're not displaying interim transcripts here
-
     if (isSpeaking) {
         timeoutId = setTimeout(() => {
             if (interimTranscript.trim() === '') {
                 stopSpeakingAndSend();
             }
-        }, 1000);
+        }, 5000); // Adjust the timeout as needed
     }
 
     isFirstResult = false;
@@ -346,6 +318,7 @@ recognition.onend = function () {
 
 recognition.onerror = function(event) {
     console.error('Speech recognition error detected: ' + event.error);
+    alert('Speech recognition error detected: ' + event.error);
     updateSpeakerIndicator("Error");
     recognition.stop();
 };

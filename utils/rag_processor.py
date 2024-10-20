@@ -1,5 +1,19 @@
 import requests
 import json
+import os
+def read_python_files(folder_path):
+    python_files_content = ""
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith('.py'):
+                file_path = os.path.join(root, file)
+                try:
+                    with open(file_path, 'r') as f:
+                        file_content = f.read()
+                        python_files_content += f"\n\n### File: {file}\n\n{file_content}"
+                except Exception as e:
+                    print(f"Error reading {file}: {e}")
+    return python_files_content
 
 def process_rag(folder_path, index_folder=None):
     # Since Vectara API is being used directly, we may not need to process documents here.

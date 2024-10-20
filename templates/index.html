@@ -2,40 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Simple Web Code Editor with Chat and Voice Assistant</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Code Editor with Chat and Voice Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .editor-section, .chat-section, .voice-section {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-top: 5px solid #4299e1;
+        }
+        .editor-section { border-color: #4299e1; }
+        .chat-section { border-color: #48bb78; }
+        .voice-section { border-color: #ed8936; }
+        #editor {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-family: 'Fira Code', monospace;
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+        #chatWindow {
+            height: 200px;
+            overflow-y: auto;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            background-color: #f7fafc;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #48bb78;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+        .btn-tertiary {
+            background-color: #ed8936;
+            color: white;
+        }
+        .btn-tertiary:hover {
+            background-color: #dd6b20;
+            transform: translateY(-2px);
+        }
+        input[type="text"], input[type="file"] {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.5rem;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+        .section-title {
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+    </style>
 </head>
-<body>
-
-<h1>Simple Web Code Editor with Chat and Voice Assistant</h1>
-
-<!-- Existing code editor elements -->
-<input type="file" id="folderInput" webkitdirectory multiple>
-<button id="uploadFolderButton">Upload Folder</button>
-
-<div id="message"></div>
-
-<div id="fileList"></div>
-
-<textarea id="editor" placeholder="Select a file to edit..."></textarea>
-<br>
-<button id="saveButton">Save File</button>
-
-<!-- Chatbox interface -->
-<div id="chatbox">
-    <h2>Chat with Assistant</h2>
-    <div id="chatWindow"></div>
-    <input type="text" id="chatInput" placeholder="Type your question here...">
-    <button id="sendButton">Send</button>
-</div>
-
-<!-- Speech-to-Text Interface -->
-<div id="speechInterface">
-    <h2>Voice Assistant</h2>
-    <div id="speakerIndicator">Waiting to begin conversation...</div>
-    <button id="beginConversationButton">Begin Conversation</button>
-</div>
-
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<body class="bg-gray-100">
+    <div class="container">
+        <h1 class="text-4xl font-bold mb-8 text-center text-indigo-700">Web Code Editor with Chat and Voice Assistant</h1>
+        
+        <div class="editor-section">
+            <h2 class="section-title text-2xl">Code Editor</h2>
+            <div class="mb-4">
+                <input type="file" id="folderInput" webkitdirectory multiple class="hidden">
+                <label for="folderInput" class="btn btn-primary mr-2">Choose Folder</label>
+                <button id="uploadFolderButton" class="btn btn-primary">Upload Folder</button>
+            </div>
+            <div id="message" class="text-sm text-gray-600 mb-2"></div>
+            <div id="fileList" class="mb-4 text-sm text-gray-700"></div>
+            <textarea id="editor" class="mb-4" placeholder="Select a file to edit..."></textarea>
+            <button id="saveButton" class="btn btn-primary">Save File</button>
+        </div>
+        
+        <div class="chat-section">
+            <h2 class="section-title text-2xl">Chat with Assistant</h2>
+            <div id="chatWindow" class="bg-gray-50"></div>
+            <div class="flex">
+                <input type="text" id="chatInput" placeholder="Type your question here..." class="flex-grow mr-2 p-2 border border-gray-300 rounded">
+                <button id="sendButton" class="btn btn-secondary">Send</button>
+            </div>
+        </div>
+        
+        <div class="voice-section">
+            <h2 class="section-title text-2xl">Voice Assistant</h2>
+            <div id="speakerIndicator" class="mb-4 text-gray-600">Waiting to begin conversation...</div>
+            <button id="beginConversationButton" class="btn btn-tertiary">Begin Conversation</button>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

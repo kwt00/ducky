@@ -22,18 +22,13 @@ def save_uploaded_files(files, upload_folder):
         file.save(filepath)
 
 
-def save_file_content(relative_path, content, upload_folder):
-    # Sanitize the file path
-    relative_path = sanitize_filepath(relative_path)
-    # Extract the base filename
-    base_filename = os.path.basename(relative_path)
-    # Skip saving hidden files
-    if base_filename.startswith('.'):
-        print(f"Skipping hidden file: {relative_path}")
-        return
-    filepath = os.path.join(upload_folder, relative_path)
-    # Ensure the directory exists
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    # Write the content to the file
-    with open(filepath, 'w', encoding='utf-8') as f:
-        f.write(content)
+def get_uploaded_py_files_content(upload_folder):
+    code_contents = ""
+    for root, dirs, files in os.walk(upload_folder):
+        for file in files:
+            if file.endswith('.py'):
+                file_path = os.path.join(root, file)
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    code_contents += f'\n# File: {file_path}\n'
+                    code_contents += f.read()
+    return code_contents
