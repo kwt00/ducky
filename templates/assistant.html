@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HeyGenAI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Styles for the assistant interface */
+        #chatContainer {
+            max-width: 600px;
+            margin: auto;
+        }
+        #chatBox {
+            border: 1px solid #ccc;
+            height: 400px;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+        #userInput {
+            width: 80%;
+        }
+        #sendButton {
+            width: 18%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>HeyGenAI Assistant</h1>
+
+<div id="chatContainer">
+    <div id="chatBox"></div>
+    <input type="text" id="userInput" placeholder="Ask about the code...">
+    <button id="sendButton">Send</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+</body>
+</html>

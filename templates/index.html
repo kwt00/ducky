@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Web Code Editor with Chat and Voice Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+<h1>Simple Web Code Editor with Chat and Voice Assistant</h1>
+
+<!-- Existing code editor elements -->
+<input type="file" id="folderInput" webkitdirectory multiple>
+<button id="uploadFolderButton">Upload Folder</button>
+
+<div id="message"></div>
+
+<div id="fileList"></div>
+
+<textarea id="editor" placeholder="Select a file to edit..."></textarea>
+<br>
+<button id="saveButton">Save File</button>
+
+<!-- Chatbox interface -->
+<div id="chatbox">
+    <h2>Chat with Assistant</h2>
+    <div id="chatWindow"></div>
+    <input type="text" id="chatInput" placeholder="Type your question here...">
+    <button id="sendButton">Send</button>
+</div>
+
+<!-- Speech-to-Text Interface -->
+<div id="speechInterface">
+    <h2>Voice Assistant</h2>
+    <div id="speakerIndicator">Waiting to begin conversation...</div>
+    <button id="beginConversationButton">Begin Conversation</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
