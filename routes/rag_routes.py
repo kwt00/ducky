@@ -52,19 +52,40 @@ def ask():
 
         completion = client.chat.completions.create(
             model="Meta-Llama-3.1-8B-Instruct",
-            max_completion_tokens=100,
             messages = [
-                {"role": "system", "content": "You are a debugger. Give advice and reference the error explicitly (error code and line) in your response if there is one, if not, dont. Keep it very breif."},
+                {"role": "system", "content": "You are a debugger. Give advice and reference the error explicitly (error code and line) in your response if there is one, if not, dont."},
                 {"role": "user", "content": combined_content}
             ],
             stream= False
         )
-
-        # Get the assistant's response
-        assistant_response = completion.choices[0].message.content
         
+        
+        assistant_response1 = completion.choices[0].message.content
+        
+        completion = client.chat.completions.create(
+            model="Meta-Llama-3.1-8B-Instruct",
+            messages = [
+                {"role": "system", "content": "You are a critiquer, harshly evaluate the debugging advice below, be succinct but comprehensive."},
+                {"role": "user", "content": assistant_response1}
+            ],
+            stream= False
+        )
+        critiquer_response = completion.choices[0].message.content
+        # Get the assistant's response
+        completion = client.chat.completions.create(
+            model="Meta-Llama-3.1-8B-Instruct",
+            max_completion_tokens=500,
+            messages = [
+                {"role": "system", "content": "You are a debugger, take into account the criticism below and revise your previous advice. Keep it short and concise"},
+                {"role": "user", "content": critiquer_response}
+            ],
+            stream= False
+        )
+        
+        assistant_response2 = completion.choices[0].message.content
+
         # Return the assistant's response in JSON format
-        return jsonify({'answer': assistant_response}), 200
+        return jsonify({'answer': assistant_response2}), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
